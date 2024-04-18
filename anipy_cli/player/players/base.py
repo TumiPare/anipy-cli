@@ -98,6 +98,13 @@ class SubProcessPlayerBase(PlayerBase):
         try:
             if os.name in ("nt", "dos"):
                 sub_proc = sp.Popen(player_command)
+            elif sp.check_output(['uname', '-o']).strip() == b'Android':
+                video_link = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                command = ["am", "start", "--user", "0", "-a", "android.intent.action.VIEW", "-d", player_command[1], "-n", "is.xyz.mpv/.MPVActivity"]
+                try:
+                    sp.run(command, check=True, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+                except sp.CalledProcessError as e:
+                    print(f"Failed to execute command: {e}")
             else:
                 sub_proc = sp.Popen(player_command, stdout=sp.PIPE, stderr=sp.DEVNULL)
         except FileNotFoundError as e:
